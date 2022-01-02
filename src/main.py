@@ -14,7 +14,10 @@ TY_SESSION_ID = input("TY_SESSION_ID:")
 acw_tc = input("acw_tc:")
 workExamType = input("workExamType:")
 # 课程ID
-courseOpenId = "4ljtabatvkjjmrkllppccg"  # java的ID
+courseOpenId = "crrzaymtuypgrgynmrmfq"  # java的ID
+
+# 不同的完成种类有不同的键值
+typeKeyList = ["workExamData", "paperData"]
 
 headers = {
     "Host": "mooc.icve.com.cn",
@@ -36,14 +39,33 @@ headers = {
 
 # 获得本试卷的正确答案，返回字典
 # {"题目ID": 答案}
-def getTrueAnswerList(datas):
-    datas = json.loads(datas["workExamData"])
-    questions = datas["questions"]
+def getTrueAnswerList(ansData):
     list = {}
-    for i in questions:
-        # questionId = i["questionId"]
-        # answer = i["Answer"]
-        list[i["questionId"]] = i["Answer"]
+    for x in typeKeyList:
+        try:
+            data = ansData[x]
+            if workExamType == 2:
+                datas = json.loads(data)
+            else:
+                datas = data
+            questions = datas["questions"]
+            for i in questions:
+                try:
+                    answerList = i["answerList"]
+                    if len(answerList) == 0:
+                        raise Exception()
+                    for j in range(0, len(answerList)):
+                        if answerList[j]["IsAnswer"] == 'True':
+                            list[i["questionId"]] = j
+                            # 暂时只有单选
+                            continue
+                    else:
+                        continue
+                except Exception as ex:
+                    # print(ex)
+                    print(i["TitleText"] + "\n可能是非单选题")
+        except:
+            pass
     return list
 
 
@@ -63,6 +85,7 @@ def request(workExamId):
 # uniqueId属于暂存ID，提交答案时要带上
 
 def putAnswer(questionId, answer, uniqueId):
+    print(questionId)
     url = "https://mooc.icve.com.cn/study/workExam/onlineHomeworkAnswer"
     params = f"?questionId={questionId}&answer={answer}&questionType=1&uniqueId={uniqueId}"
 
@@ -108,6 +131,7 @@ def run():
     for j in list:
         time.sleep(0.5)
         workExamId = j
+        print(workExamId)
         jsonObj = request(workExamId)
 
         # 暂存唯一ID
