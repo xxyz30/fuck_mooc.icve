@@ -1,4 +1,6 @@
 Cookies = {}
+BankServer = ""
+AutoCommit = True
 
 
 def getHeaders():
@@ -9,7 +11,8 @@ def getHeaders():
         "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
         "Accept-Encoding": "gzip, deflate, br",
         "Connection": "keep-alive",
-        "Cookie": f"verifycode={Cookies['verifycode']}; auth={Cookies['auth']}; token={Cookies['token']}; acw_tc={Cookies['acw_tc']};",# _bl_uid={Cookies['_bl_uid']}; TY_SESSION_ID={Cookies['TY_SESSION_ID']};",
+        "Cookie": f"verifycode={Cookies['verifycode']}; auth={Cookies['auth']}; token={Cookies['token']}; acw_tc={Cookies['acw_tc']};",
+        # _bl_uid={Cookies['_bl_uid']}; TY_SESSION_ID={Cookies['TY_SESSION_ID']};",
         "Upgrade-Insecure-Requests": "1",
         "Sec-Fetch-Dest": "document",
         "Sec-Fetch-Mode": "navigate",

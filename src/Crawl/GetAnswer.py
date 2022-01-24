@@ -77,7 +77,6 @@ def crawlCourse(courses):
                 SQL.insert(resList)
 
 
-
 def run(startPage=1):
     # 先分页查找
     nowPage = startPage

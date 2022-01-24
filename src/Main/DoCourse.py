@@ -2,6 +2,8 @@ import json
 import random
 import time
 from urllib import request as req
+
+import Config
 from Config import *
 
 
@@ -45,8 +47,15 @@ class DoCourse:
                                 # questionType = i["questionType"]
                                 list[i["questionId"]] = i["Answer"]
                         else:
-                            pass
-                            # TODO 到时候请求题库服务器
+                            try:
+                                resp = req.urlopen(req.Request(f"{Config.BankServer}?id={i['questionId']}"))
+                                jsonObj = json.loads(resp.read())
+                                if jsonObj["code"] == 1:
+                                    list[i["questionId"]] = jsonObj["answer"]
+                                else:
+                                    print(jsonObj["message"])
+                            except:
+                                print("题库服务器访问错误或者题库服务器返回错误！")
                     else:
                         print(i["Title"] + "\n可能不是单选、多选或者判断")
             except Exception as ex:
@@ -133,5 +142,7 @@ class DoCourse:
                     trueList = self.getTrueAnswerList(jsonObj)
                     for i in trueList.keys():
                         self.putAnswer(i, trueList[i], uniqueId)
-
-                self.submitAnswer(uniqueId, workExamId)
+                if Config.AutoCommit:
+                    self.submitAnswer(uniqueId, workExamId)
+                else:
+                    print("已经跳过自动提交，请手动提交。")
