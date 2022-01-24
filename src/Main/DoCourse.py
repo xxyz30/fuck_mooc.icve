@@ -41,13 +41,12 @@ class DoCourse:
 
                         if self.crawlMode:
                             if historyMode:
+                                # 爬取模式且是历史模式时
                                 # questionType = i["questionType"]
                                 list[i["questionId"]] = i["Answer"]
-                            else:
-                                list[i["questionId"]] = None
                         else:
                             pass
-                            # TODO 到时候请求服务器
+                            # TODO 到时候请求题库服务器
                     else:
                         print(i["Title"] + "\n可能不是单选、多选或者判断")
             except Exception as ex:
@@ -70,6 +69,9 @@ class DoCourse:
     # uniqueId属于暂存ID，提交答案时要带上
 
     def putAnswer(self, questionId, answer, uniqueId):
+        # 爬取模式则不需要提交答案
+        if self.crawlMode:
+            return
         # print(questionId)
         url = "https://mooc.icve.com.cn/study/workExam/onlineHomeworkAnswer"
         params = f"?questionId={questionId}&answer={answer}&questionType=1&uniqueId={uniqueId}"
@@ -126,8 +128,10 @@ class DoCourse:
                 jsonObj = self.request(workExamId)
                 # 暂存唯一ID
                 uniqueId = jsonObj["uniqueId"]
-                trueList = self.getTrueAnswerList(jsonObj)
-                for i in trueList.keys():
-                    self.putAnswer(i, trueList[i], uniqueId)
+                if not self.crawlMode:
+                    # 不是爬取模式时则不用暂存答案
+                    trueList = self.getTrueAnswerList(jsonObj)
+                    for i in trueList.keys():
+                        self.putAnswer(i, trueList[i], uniqueId)
 
                 self.submitAnswer(uniqueId, workExamId)

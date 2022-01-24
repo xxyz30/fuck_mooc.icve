@@ -2,6 +2,7 @@ import json
 
 import Config
 from Crawl.GetAnswer import run
+from Login.DoLogin import login
 
-Config.Cookies = json.loads(input("cookie"))["请求 Cookie"]
+Config.Cookies = login()
 run()

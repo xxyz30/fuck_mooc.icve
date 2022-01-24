@@ -1,14 +1,14 @@
 from Main.DoCourse import *
-import json
 import Config
+from Login.DoLogin import login
 from Main.GetAllCourse import getAllCourse
 
-Config.Cookies = json.loads(input("cookie"))["请求 Cookie"]
 
+Config.Cookies = login()
 # 课程ID
 # courseOpenId = input("courseOpenId:")
 
 for i in getAllCourse()["list"]:
     courseOpenId = i["courseOpenId"]
     print(i["courseName"] + courseOpenId)
-    DoCourse(courseOpenId).run()
+    # DoCourse(courseOpenId).run()

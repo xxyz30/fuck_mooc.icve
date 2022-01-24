@@ -46,10 +46,14 @@ def getstudentWorkId(courseOpenId, workExamId):
 # https://mooc.icve.com.cn/study/workExam/history?courseOpenId=?&workExamId=?&studentWorkId=?
 # 获得作答记录
 def getAnsower(courseOpenId, workExamId):
-    studentWorkId = getstudentWorkId(courseOpenId, workExamId)["list"][0]["Id"]
-    url = f"https://mooc.icve.com.cn/study/workExam/history?courseOpenId={courseOpenId}&workExamId={workExamId}&studentWorkId={studentWorkId}"
-    resp = req.urlopen(req.Request(url, headers=Config.getHeaders()))
-    return json.loads(resp.read())
+    studentWorkId = getstudentWorkId(courseOpenId, workExamId)
+    if len(studentWorkId["list"]) != 0:
+        studentWorkId = studentWorkId["list"][0]["Id"]
+        url = f"https://mooc.icve.com.cn/study/workExam/history?courseOpenId={courseOpenId}&workExamId={workExamId}&studentWorkId={studentWorkId}"
+        resp = req.urlopen(req.Request(url, headers=Config.getHeaders()))
+        return json.loads(resp.read())
+    else:
+        print(f"课程{courseOpenId}的{workExamId}试题没有任何答题记录，爬取错误！")
 
 
 def crawlCourse(courses):
@@ -81,13 +85,12 @@ def run(startPage=1):
         allCourse = getAllCourse(nowPage)
         try:
             crawlCourse(allCourse["list"])
-            return
         except Exception as ex:
             print(f"出现异常了。目前爬取到了{nowPage}页")
             raise ex
 
         pagination = allCourse["pagination"]
-        allPage = 1  # math.ceil(pagination["totalCount"] / pagination["pageSize"])
+        allPage = math.ceil(pagination["totalCount"] / pagination["pageSize"])
 
         if nowPage >= allPage:
             break
